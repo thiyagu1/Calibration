@@ -24,7 +24,7 @@ void Stereo_calibrate::Varjo_initialize(){
     
     bool Ok;
     for (int i=1; i<=Num_imgs; i++) {
-        string Filename = Dir + std::to_string(i) + ".bmp";
+        string Filename = Dir + std::to_string(i) + EXT;
         cout<<Filename<<endl;
         img = imread(Filename, CV_LOAD_IMAGE_COLOR);
         cv::cvtColor(img, grey, CV_BGR2GRAY);
@@ -76,7 +76,7 @@ void Stereo_calibrate::Varjo_initialize(){
 Mat Stereo_calibrate:: distortion_correction(char const* imgs_directory,int number, Mat camera_matrix, Mat Distortion_coeff){
     
     Mat img, imgk,ori, imgdis_corrected;
-    string Filename = imgs_directory + std::to_string(number) + ".bmp";
+    string Filename = imgs_directory + std::to_string(number) + EXT;
     ori = imread(Filename, CV_LOAD_IMAGE_COLOR);
     cout<<Filename<<endl;
     imgk = imread(Filename, CV_LOAD_IMAGE_COLOR);

@@ -26,19 +26,19 @@ int main(int argc, const char * argv[]) {
     //*******************************************************
     
     int choice;
-    double W = 1008;
-    double H = 1008;
+    double W = Width;
+    double H = Height;
     int board_width, board_height, num_imgs;
     float square_size;
     char const* imgs_directory1;
     char const* imgs_directory2;
     string Filename;
-    board_width = 10;
-    board_height = 6;
-    num_imgs = 34;
-    square_size = 90;
-    imgs_directory1 = "./VLeftBig/";
-    imgs_directory2 = "./VRightBig/";
+    board_width = Board_W;
+    board_height = Board_H;
+    num_imgs = ImageCount;
+    square_size = SQsize;
+    imgs_directory1 = Left_Directory;
+    imgs_directory2 = Right_Directory;
     
     cout<<"**************************************************"<<endl;
     cout<< "Welcome to the Calibration Application"<<endl;
@@ -268,21 +268,16 @@ int main(int argc, const char * argv[]) {
                 
              //   Rect validRoI[2];
                 Mat map1, map2, map3, map4;
-                int number = 5;
-                int pos = 0;
-                
-               
+                int number = Distortion_Image_No;
                 
            // stereoRectify(cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY,1,cam1.img.size(), &validRoI[0], &validRoI[1]);
             stereoRectify(cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY);
-                
+                cout <<"good"<<endl;
                 initUndistortRectifyMap(cam1.K, cam1.D, R1, P1, cam1.img.size(), CV_32FC1, map1, map2);
                 initUndistortRectifyMap(cam2.K, cam2.D, R2, P2, cam2.img.size(), CV_32FC1, map3, map4);
                 rectifiedimage(imgs_directory1, number, map1,map2, 1);
                 rectifiedimage(imgs_directory2, number, map3,map4, 2);
-                
-              
-                
+
               
                 
             cout <<endl<<"Generating Result : "<<endl;
@@ -434,16 +429,16 @@ int main(int argc, const char * argv[]) {
 void rectifiedimage(char const* imgs_directory,int number, Mat mapx, Mat mapy, int pos)
 {
     Mat img, imgk,ori, imgdis_corrected;
-    string Filename = imgs_directory + std::to_string(number) + ".bmp";
+    string Filename = imgs_directory + std::to_string(number) + EXT;
     ori = imread(Filename, CV_LOAD_IMAGE_COLOR);
     cout<<Filename<<endl;
     imgk = imread(Filename, CV_LOAD_IMAGE_COLOR);
     //undistort(imgk, imgdis_corrected, camera_matrix, Distortion_coeff);
     remap(imgk, imgdis_corrected, mapx, mapy, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar());
     cout<<"Remap done"<<endl;
-    string Save_corrected ="Distortion_Corrected" + std::to_string(pos) + ".bmp";
+    string Save_corrected ="Distortion_Corrected" + std::to_string(pos) + EXT;
     imwrite( Save_corrected, imgdis_corrected );
-    string Save_original ="Undistorted_Original" + std::to_string(pos) + ".bmp";
+    string Save_original ="Undistorted_Original" + std::to_string(pos) + EXT;
     imwrite( Save_original, ori );
 }
 

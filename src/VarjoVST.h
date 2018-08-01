@@ -21,9 +21,17 @@
 using namespace std;
 using namespace cv;
 
-//int SDump_result(Mat , Mat , vector< Mat > , vector< Mat > );
-//stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E, F);
-
+//Config File
+#define EXT ".jpg";
+#define Width 1008;
+#define Height 1008;
+#define ImageCount 34;
+#define SQsize 90;//in millimeter(mm)
+#define Board_H 6;
+#define Board_W 10;
+#define Left_Directory "./VLeftBig/";
+#define Right_Directory "./VRightBig/";
+#define Distortion_Image_No 6;
 
 #endif /* VarjoVST_h */
 

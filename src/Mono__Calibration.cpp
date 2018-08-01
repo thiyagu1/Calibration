@@ -7,7 +7,7 @@
 //
 
 #include "Mono__Calibration.hpp"
-#define EXT ".jpg";
+
 Mono_calibrate:: Mono_calibrate(int board_width, int board_height, int num_imgs, float square_size, const char *imgs_directory){
     
     Board_height = board_height;
@@ -21,8 +21,8 @@ Mono_calibrate:: Mono_calibrate(int board_width, int board_height, int num_imgs,
 
 void Mono_calibrate::Varjo_initialize(){
     
-    double W = 1008;
-    double H = 1008;
+    double W = Width;
+    double H = Height;
     cv::Size imageSize(W,H);
     bool Ok;
     for (int i=1; i<=Num_imgs; i++) {
@@ -129,7 +129,8 @@ void Mono_calibrate::Varjo_initialize(){
     outFile.write((const char*)&intr, sizeof(intrinsics));
     
     int kp = Dump_result(K, D, rvecs, tvecs);
-    distortion_correction(Dir, 6, K, D);
+    int number = Distortion_Image_No;
+    distortion_correction(Dir, number, K, D);
     FOV(K,imageSize);
     cout<<"FOV X= "<<aFOV[0]<<endl;
     cout<<"FOV Y= "<<aFOV[1]<<endl;

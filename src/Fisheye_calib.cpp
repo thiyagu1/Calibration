@@ -7,7 +7,7 @@
 //
 
 #include "Fisheye_calib.hpp"
-#define EXT ".jpg";
+
 
 Fisheye_calibrate:: Fisheye_calibrate(int board_width, int board_height, int num_imgs, float square_size, const char *imgs_directory){
     
@@ -22,8 +22,8 @@ Fisheye_calibrate:: Fisheye_calibrate(int board_width, int board_height, int num
 
 void Fisheye_calibrate::Varjo_initialize(){
     
-    double W = 1008;
-    double H = 1008;
+    double W = Width;
+    double H = Height;
     cv::Size imageSize(W,H);
     bool Ok;
     for (int i=1; i<=Num_imgs; i++) {
@@ -133,7 +133,8 @@ void Fisheye_calibrate::Varjo_initialize(){
     outFile.write((const char*)&intr, sizeof(intrinsics));
     
     int kp = Dump_result(K, D, rvecs, tvecs);
-    distortion_correction(Dir, 1, K, D, imageSize);
+    int number = Distortion_Image_No;
+    distortion_correction(Dir, number, K, D, imageSize);
     FOV(K,imageSize);
     cout<<"FOV X= "<<aFOV[0]<<endl;
     cout<<"FOV Y= "<<aFOV[1]<<endl;
@@ -151,7 +152,7 @@ Mat Fisheye_calibrate:: distortion_correction(char const* imgs_directory,int num
    
     Mat newK, map1, map2;
     Mat img, imgk,ori, imgdis_corrected;
-    string Filename = imgs_directory + std::to_string(6) + EXT;
+    string Filename = imgs_directory + std::to_string(number) + EXT;
     ori = imread(Filename, CV_LOAD_IMAGE_COLOR);
     cout<<Filename<<endl;
     imgk = imread(Filename, CV_LOAD_IMAGE_COLOR);
