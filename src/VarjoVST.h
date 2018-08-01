@@ -32,6 +32,6 @@ using namespace cv;
 #define Left_Directory "./VLeftBig/";
 #define Right_Directory "./VRightBig/";
 #define Distortion_Image_No 6;
-
+#define Model 1; // Parm - 0 (Pinhole Model), Parm - 1 (Fisheye Model)
 #endif /* VarjoVST_h */
 

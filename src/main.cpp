@@ -45,7 +45,7 @@ int main(int argc, const char * argv[]) {
     cout<<"**************************************************"<<endl;
     cout<<endl<<endl;
     cout<<"Menus : "<<endl;
-    cout<<"0. Configuration Settings: "<<endl<<"1. Camera Capture CheckerBoard"<<endl<<"2. Single Camera Calibration"<<endl<<"3. Fisheye Mono Camera Calibration"<<endl<<"4. Stereo Camera Calibration"<<endl;
+    cout<<"0. Configuration Settings: "<<endl<<"1. Camera Capture CheckerBoard"<<endl<<"2. Single Camera Calibration"<<endl<<"3. Stereo Camera Calibration"<<endl;
     cout<<endl<<"Please enter your choice : "<<endl;
     cin>>choice;
     cout<<"So your choice is = "<<choice<<endl;
@@ -152,27 +152,36 @@ int main(int argc, const char * argv[]) {
             
         case 2:
             {
-            cout<< "Welcome to the Single Camera Calibration"<<endl;
-            cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
+                int m = Model;
+            if( m == 0)
+            {
+            cout<< "Welcome to the Single Camera Calibration - Pinhole Model"<<endl;
             Mono_calibrate Mono(board_width, board_height, num_imgs,square_size, imgs_directory2);
             Mono.Varjo_initialize();
-                
+            }
+            else
+            {
+                cout<< "Welcome to the Single Camera Calibration - Fish Eye Model"<<endl;
+                Fisheye_calibrate Fish(board_width, board_height, num_imgs,square_size, imgs_directory1);
+                Fish.Varjo_initialize();
+            }
             }
              out= false;
             break;
         
-         case 3:
-         {
-             cout<< "Welcome to the Single Camera Calibration"<<endl;
-             cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
-             Fisheye_calibrate Fish(board_width, board_height, num_imgs,square_size, imgs_directory1);
-             Fish.Varjo_initialize();
              
-         }
-             out= false;
-             break;
+//         case 3:
+//         {
+//             cout<< "Welcome to the Single Camera Calibration"<<endl;
+//             cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
+//             Fisheye_calibrate Fish(board_width, board_height, num_imgs,square_size, imgs_directory1);
+//             Fish.Varjo_initialize();
+//
+//         }
+//             out= false;
+//             break;
         
-        case 4:
+        case 3:
             {
             cout<< "Welcome to the Stereo Camera Calibration"<<endl;
             cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
