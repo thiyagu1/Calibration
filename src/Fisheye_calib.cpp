@@ -67,6 +67,7 @@ void Fisheye_calibrate::Varjo_initialize(){
 
     //calibrateCamera(RealP, ImageP, img.size(), K, D, rvecs, tvecs, flag);
     double mse= fisheye::calibrate(RealP, ImageP, img.size(), K, D, rvecs, tvecs, flag,  cv::TermCriteria(3, 20, 1e-6));
+    cout<<"Before K and D : "<<endl<<K<<endl<<D<<endl;
     cout<<"Mean Square Error = "<<mse<<endl;
     //      Accessing elements in a matrix
     //
@@ -175,6 +176,7 @@ int Fisheye_calibrate:: Dump_result(Mat K, Mat point, vector< Mat > rvecs, vecto
     
     
     std::ofstream output_file5("./Mono/A_Distortion_Coefficient.txt");
+    cout<<D;
     output_file5 << D;
     output_file5.close();
     cout<<"2. Distortion Coefficient Completed "<<endl;
