@@ -18,20 +18,22 @@
 #include <iterator>
 #include <string>
 #include <stdlib.h>
+#include <math.h>
+
 using namespace std;
 using namespace cv;
 
 //Config File
-#define EXT ".jpg";
-#define Width 1008;
-#define Height 1008;
-#define ImageCount 34;
-#define SQsize 90;//in millimeter(mm)
-#define Board_H 6;
-#define Board_W 10;
-#define Left_Directory "./VLeftBig/";
-#define Right_Directory "./VRightBig/";
-#define Distortion_Image_No 6;
-#define Model 1; // Parm - 0 (Pinhole Model), Parm - 1 (Fisheye Model)
+#define EXT ".jpg"
+#define Width 1008
+#define Height 1008
+#define ImageCount 34
+#define SQsize 90//in millimeter(mm)
+#define Board_H 6
+#define Board_W 10
+#define Left_Directory "./VLeftBig/"
+#define Right_Directory "./VRightBig/"
+#define Distortion_Image_No 6
+#define Model 1 // Parm - 0 (Pinhole Model), Parm - 1 (Fisheye Model)
 #endif /* VarjoVST_h */
 

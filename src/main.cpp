@@ -2,6 +2,7 @@
 #include "Mono__Calibration.hpp"
 #include "Stereo__Calibration.hpp"
 #include "Fisheye_calib.hpp"
+#include "Rotation_YPR_convertion.hpp"
 
 /*       Resolution
  
@@ -26,6 +27,7 @@ int main(int argc, const char * argv[]) {
     //*******************************************************
     
     int choice;
+    vector<double > Angles;
     double W = Width;
     double H = Height;
     int board_width, board_height, num_imgs;
@@ -45,7 +47,7 @@ int main(int argc, const char * argv[]) {
     cout<<"**************************************************"<<endl;
     cout<<endl<<endl;
     cout<<"Menus : "<<endl;
-    cout<<"0. Configuration Settings: "<<endl<<"1. Camera Capture CheckerBoard"<<endl<<"2. Single Camera Calibration"<<endl<<"3. Stereo Camera Calibration"<<endl;
+    cout<<"0. Configuration Settings: "<<endl<<"1. Camera Capture CheckerBoard"<<endl<<"2. Single Camera Calibration"<<endl<<"3. Rotation matrix"<<endl<<"4.Stereo Camera Calibration"<<endl;
     cout<<endl<<"Please enter your choice : "<<endl;
     cin>>choice;
     cout<<"So your choice is = "<<choice<<endl;
@@ -169,19 +171,27 @@ int main(int argc, const char * argv[]) {
              out= false;
             break;
         
+         case 3:
+         {
+             double matrix[] ={0.9999936100852538, 0.003574842084593224, 1.710940292103228e-05,
+                 -0.003574841824536402, 0.9999936101169358, -1.520616586632866e-05,
+                 -1.716365323563225e-05, 1.514490529107057e-05, 0.9999999997380205};
              
-//         case 3:
-//         {
-//             cout<< "Welcome to the Single Camera Calibration"<<endl;
-//             cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
-//             Fisheye_calibrate Fish(board_width, board_height, num_imgs,square_size, imgs_directory1);
-//             Fish.Varjo_initialize();
-//
-//         }
-//             out= false;
-//             break;
+             Mat R_Mat(3,3, CV_64F,matrix);
+             //cout<<R_Mat<<endl;
+                 cout<< "Conversion Rotation Matrix to YAW, Pitch and Roll"<<endl;
+             
+             //Angles = R2YPR(R_Mat);
+             Angles = R2YPR(R_Mat);
+             cout<<"x = "<<Angles[0]<<endl;
+             cout<<"y = "<<Angles[1]<<endl;
+             cout<<"z = "<<Angles[2]<<endl;
+             }
+             
+             out= false;
+             break;
         
-        case 3:
+        case 4:
             {
             cout<< "Welcome to the Stereo Camera Calibration"<<endl;
             cout<< "By default its 10 x 6 Checker Board Calibration "<<endl;
@@ -198,30 +208,36 @@ int main(int argc, const char * argv[]) {
             cam2.Varjo_initialize();
 //            cam1.flag |= CV_CALIB_FIX_INTRINSIC;
 //            cam2.flag |= CV_CALIB_FIX_INTRINSIC;
+                int flag = 0;
+                 flag |= CV_CALIB_FIX_INTRINSIC;
+                double rms = stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E,F, CALIB_FIX_ASPECT_RATIO +
+                                             CALIB_ZERO_TANGENT_DIST +
+                                             CALIB_USE_INTRINSIC_GUESS +
+                                             CALIB_SAME_FOCAL_LENGTH +
+                                             CALIB_RATIONAL_MODEL +
+                                             CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6)); // CV_CALIB_FIX_INTRINSIC, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6)
                 
-                double rms = stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E,F, CV_CALIB_FIX_INTRINSIC, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6));
-                
-                // Intrensics for camera 1
-                cam1.D.at<double>(0,0) = -0.4174063375804019;
-                cam1.D.at<double>(0,1) = 0.2384770571632834;
-                cam1.D.at<double>(0,4) = -0.0810992975920146;
-                cam1.D.at<double>(0,2) =  0.0002154502083552362;
-                cam1.D.at<double>(0,3) = -0.00143025446229229;
-                cam1.K.at<double>(0,0) = 631.9554805843405;
-                cam1.K.at<double>(1,1) = 631.1904774908304;
-                cam1.K.at<double>(0,2) = 512.7207379179949;
-                cam1.K.at<double>(1,2) = 466.4421749283331;
-                
-                // Intrensics for camera 2
-                cam2.D.at<double>(0,0) = -0.4081407344191473;
-                cam2.D.at<double>(0,1) = 0.2176541538545262;
-                cam2.D.at<double>(0,4) =-0.06604786876530386;
-                cam2.D.at<double>(0,2) = -0.0007143496513723286;
-                cam2.D.at<double>(0,3) = -0.0001404107145636459;
-                cam2.K.at<double>(0,0) = 629.2711604878951;
-                cam2.K.at<double>(1,1) = 628.5435111583766;
-                cam2.K.at<double>(0,2) = 500.5283689158744;
-                cam2.K.at<double>(1,2) = 488.5061520580846;
+//                // Intrensics for camera 1
+//                cam1.D.at<double>(0,0) = -0.4174063375804019;
+//                cam1.D.at<double>(0,1) = 0.2384770571632834;
+//                cam1.D.at<double>(0,4) = -0.0810992975920146;
+//                cam1.D.at<double>(0,2) =  0.0002154502083552362;
+//                cam1.D.at<double>(0,3) = -0.00143025446229229;
+//                cam1.K.at<double>(0,0) = 631.9554805843405;
+//                cam1.K.at<double>(1,1) = 631.1904774908304;
+//                cam1.K.at<double>(0,2) = 512.7207379179949;
+//                cam1.K.at<double>(1,2) = 466.4421749283331;
+//
+//                // Intrensics for camera 2
+//                cam2.D.at<double>(0,0) = -0.4081407344191473;
+//                cam2.D.at<double>(0,1) = 0.2176541538545262;
+//                cam2.D.at<double>(0,4) =-0.06604786876530386;
+//                cam2.D.at<double>(0,2) = -0.0007143496513723286;
+//                cam2.D.at<double>(0,3) = -0.0001404107145636459;
+//                cam2.K.at<double>(0,0) = 629.2711604878951;
+//                cam2.K.at<double>(1,1) = 628.5435111583766;
+//                cam2.K.at<double>(0,2) = 500.5283689158744;
+//                cam2.K.at<double>(1,2) = 488.5061520580846;
                 
                 
                 struct intrinsics
@@ -286,6 +302,10 @@ int main(int argc, const char * argv[]) {
                 initUndistortRectifyMap(cam2.K, cam2.D, R2, P2, cam2.img.size(), CV_32FC1, map3, map4);
                 rectifiedimage(imgs_directory1, number, map1,map2, 1);
                 rectifiedimage(imgs_directory2, number, map3,map4, 2);
+                Angles = R2YPR(R);
+                cout<<"x_1 = "<<Angles[0]<<endl;
+                cout<<"y_2 = "<<Angles[1]<<endl;
+                cout<<"z_3 = "<<Angles[2]<<endl;
 
               
                 
@@ -333,6 +353,7 @@ int main(int argc, const char * argv[]) {
                     cout<<"*****************************************"<<endl;
                     cout<<"Rotation Vector: "<<endl;
                     cout <<R<<endl;
+                    
                     std::ofstream output_file5("./Stereo/B_Rotation_vector.txt");
                     output_file5 << R;
                     output_file5.close();
@@ -419,7 +440,6 @@ int main(int argc, const char * argv[]) {
                     system("./Stereo/runn.sh");
                     system("cp ./Stereo/RESULT.txt ./Result/");
                     system("rm ./Stereo/*.txt");
-                    
                     }
                     }
                     out= false;
