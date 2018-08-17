@@ -37,10 +37,12 @@ void Mono_calibrate::Varjo_initialize(){
                          TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
             drawChessboardCorners(grey, boardsize, corners, Ok);
         }
+        if (View == 1)
+        {
         namedWindow( "View", WINDOW_AUTOSIZE );
         imshow("View", grey);
         waitKey(0);
-
+        }
         // Evaluating the corners in the Real world
         
         for (int j=0; j<Board_height; j++) {
@@ -125,9 +127,12 @@ void Mono_calibrate::Varjo_initialize(){
 
     intr.aspectRatio = (double) W/H;
     cout<<"Aspect Ratio = "<<intr.aspectRatio<<endl;
-    std::ofstream outFile("intrinsics.raw", std::ios::binary);
+    std::ofstream outFile( Main_Path + std::string("/Result/intrinsicsLeft.bin"), std::ios::binary);
+//    cout<<"**************************************************"<<endl;
+//    cout<<Main_Path + std::string("/Result/intrinsics22.raw")<<endl;
+//    cout<<"**************************************************"<<endl;
     outFile.write((const char*)&intr, sizeof(intrinsics));
-    
+ 
     int kp = Dump_result(K, D, rvecs, tvecs);
     int number = Distortion_Image_No;
     distortion_correction(Dir, number, K, D);
@@ -186,7 +191,7 @@ int Mono_calibrate:: Dump_result(Mat K, Mat point, vector< Mat > rvecs, vector< 
     output_file4.close();
     cout<<"4. Translation Vector Completed "<<endl;
   
-    system("rm ./Result/*");
+    //system("rm ./Result/*");
     system("./Mono/runn.sh");
     system("cp ./Mono/MResult.txt ./Result/");
     system("rm ./Mono/*.txt");

@@ -41,11 +41,8 @@ vector<double > R2YPR(Mat n){
     x = atan2(n.at<double>(2,1), n.at<double>(2,2));
     y = atan2( -(n.at<double>(2,0)), t);
     z = atan2(n.at<double>(1,0), n.at<double>(0,0));
-    
     Euler_Angles.push_back(x);
     Euler_Angles.push_back(y);
     Euler_Angles.push_back(z);
-    
-    return Euler_Angles;;
-    
+    return Euler_Angles;
 }

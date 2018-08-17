@@ -4,14 +4,17 @@
 #include "Fisheye_calib.hpp"
 #include "Rotation_YPR_convertion.hpp"
 
-/*       Resolution
- 
- 2.2k - 15fps - 4416x1242
- 1080p - 30fps - 3840x1080
- 720p - 60fps - 2560x720
- WVGA - 100fps - 1344x376
- 
-*/
+
+template <typename T>
+bool write(std::string fname, T d)
+{
+    std::ofstream file(fname, std::ios::binary);
+    if (file.good()) {
+        file.write((const char*)&d, sizeof(T));
+        return true;
+    } else
+        return false;
+}
 
 
 void rectifiedimage(char const* imgs_directory,int number, Mat mapx, Mat mapy, int pos);
@@ -39,8 +42,25 @@ int main(int argc, const char * argv[]) {
     board_height = Board_H;
     num_imgs = ImageCount;
     square_size = SQsize;
-    imgs_directory1 = Left_Directory;
-    imgs_directory2 = Right_Directory;
+   
+    if (Option == 0)
+    {
+        imgs_directory1 = Left_Directory;
+    }
+    else if(Option == 1)
+    {
+        imgs_directory1 = Right_Directory;
+    }
+    else if (Option == 2)
+    {
+        imgs_directory1 = Left_Directory;
+        imgs_directory2 = Right_Directory;
+    }
+    else
+    {
+        cout<<"Please choose the correct Option in the Configuration"<<endl;
+    }
+
     
     cout<<"**************************************************"<<endl;
     cout<< "Welcome to the Calibration Application"<<endl;
@@ -154,11 +174,12 @@ int main(int argc, const char * argv[]) {
             
         case 2:
             {
-                int m = Model;
+            int m = Model;
+                cout<<"Your selected Folder : "<<imgs_directory1<<endl;
             if( m == 0)
             {
             cout<< "Welcome to the Single Camera Calibration - Pinhole Model"<<endl;
-            Mono_calibrate Mono(board_width, board_height, num_imgs,square_size, imgs_directory2);
+            Mono_calibrate Mono(board_width, board_height, num_imgs,square_size, imgs_directory1);
             Mono.Varjo_initialize();
             }
             else
@@ -170,7 +191,7 @@ int main(int argc, const char * argv[]) {
             }
              out= false;
             break;
-        
+            
          case 3:
          {
              double matrix[] ={0.9999936100852538, 0.003574842084593224, 1.710940292103228e-05,
@@ -201,45 +222,39 @@ int main(int argc, const char * argv[]) {
             Mat R1, R2; // Rectification Transform for Left Camera and Right Camera.
             Mat P1, P2; // Projection Matrix in new rectified coordinate system for Left and Right Cameras.
             Mat Q; // Disparity to Depth Mapping
-            
-            Stereo_calibrate cam1(board_width, board_height, num_imgs,square_size, imgs_directory1);
-            Stereo_calibrate cam2(board_width, board_height, num_imgs,square_size, imgs_directory2);
+                if (Option == 2){
+                    Stereo_calibrate cam1(board_width, board_height, num_imgs,square_size, imgs_directory1);
+                    Stereo_calibrate cam2(board_width, board_height, num_imgs,square_size, imgs_directory2);
             cam1.Varjo_initialize();
             cam2.Varjo_initialize();
 //            cam1.flag |= CV_CALIB_FIX_INTRINSIC;
 //            cam2.flag |= CV_CALIB_FIX_INTRINSIC;
                 int flag = 0;
                  flag |= CV_CALIB_FIX_INTRINSIC;
-                double rms = stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E,F, CALIB_FIX_ASPECT_RATIO +
-                                             CALIB_ZERO_TANGENT_DIST +
-                                             CALIB_USE_INTRINSIC_GUESS +
-                                             CALIB_SAME_FOCAL_LENGTH +
-                                             CALIB_RATIONAL_MODEL +
-                                             CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6)); // CV_CALIB_FIX_INTRINSIC, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6)
                 
-//                // Intrensics for camera 1
-//                cam1.D.at<double>(0,0) = -0.4174063375804019;
-//                cam1.D.at<double>(0,1) = 0.2384770571632834;
-//                cam1.D.at<double>(0,4) = -0.0810992975920146;
-//                cam1.D.at<double>(0,2) =  0.0002154502083552362;
-//                cam1.D.at<double>(0,3) = -0.00143025446229229;
-//                cam1.K.at<double>(0,0) = 631.9554805843405;
-//                cam1.K.at<double>(1,1) = 631.1904774908304;
-//                cam1.K.at<double>(0,2) = 512.7207379179949;
-//                cam1.K.at<double>(1,2) = 466.4421749283331;
+//                double rms = stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E,F, CALIB_FIX_ASPECT_RATIO +
+//                                             CALIB_ZERO_TANGENT_DIST +
+//                                             CALIB_USE_INTRINSIC_GUESS +
+//                                             CALIB_SAME_FOCAL_LENGTH +
+//                                             CALIB_RATIONAL_MODEL +
+//                                             CALIB_FIX_K3 + CALIB_FIX_K4 + CALIB_FIX_K5, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6));
 //
-//                // Intrensics for camera 2
-//                cam2.D.at<double>(0,0) = -0.4081407344191473;
-//                cam2.D.at<double>(0,1) = 0.2176541538545262;
-//                cam2.D.at<double>(0,4) =-0.06604786876530386;
-//                cam2.D.at<double>(0,2) = -0.0007143496513723286;
-//                cam2.D.at<double>(0,3) = -0.0001404107145636459;
-//                cam2.K.at<double>(0,0) = 629.2711604878951;
-//                cam2.K.at<double>(1,1) = 628.5435111583766;
-//                cam2.K.at<double>(0,2) = 500.5283689158744;
-//                cam2.K.at<double>(1,2) = 488.5061520580846;
+//
+//
                 
+                double rms = stereoCalibrate(cam1.RealP, cam1.ImageP, cam2.ImageP, cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, E,F,CV_CALIB_SAME_FOCAL_LENGTH, TermCriteria(TermCriteria::COUNT|TermCriteria::EPS,30,1e-6));
+       
                 
+                Angles = R2YPR(R);
+                cout<<"x_1 = "<<Angles[0]<<endl;
+                cout<<"y_2 = "<<Angles[1]<<endl;
+                cout<<"z_3 = "<<Angles[2]<<endl;
+                cout<<"x = "<<T[0]<<endl;
+                cout<<"y = "<<T[1]<<endl;
+                cout<<"z = "<<T[2]<<endl;
+                cout<<"x = "<<-(T[0]/1000)<<endl;
+                cout<<"y = "<<-(T[1]/1000)<<endl;
+                cout<<"z = "<<-(T[2]/1000)<<endl;
                 struct intrinsics
                 {
                     
@@ -258,6 +273,31 @@ int main(int argc, const char * argv[]) {
                     
                 } intr1, intr2;
                 
+                struct Extrinsics {
+                    float roll;
+                    float pitch;
+                    float yaw;
+                    float translationX;
+                    float translationY;
+                    float translationZ;
+                }extr1,extr2;
+                
+                extr1.roll = 0.0; // x
+                extr1.pitch = 0.0; // y
+                extr1.yaw = 0.0; // z
+                extr1.translationX = 0.0;
+                extr1.translationY = 0.0;
+                extr1.translationZ = 0.0;
+                
+                extr2.roll = Angles[0];
+                extr2.pitch = Angles[1];//+0.065752;
+                extr2.yaw = Angles[2];
+                extr2.translationX = -(T[0]/1000);
+                extr2.translationY = -(T[1]/1000);
+                extr2.translationZ = -(T[2]/1000);
+                write("./Result/extrinsicsLeft.bin", extr1);
+                write("./Result/extrinsicsRight.bin", extr2);
+                
                 intr1.K1 = cam1.D.at<double>(0,0);
                 intr1.K2 = cam1.D.at<double>(0,1);
                 intr1.K3 = cam1.D.at<double>(0,4);
@@ -271,9 +311,10 @@ int main(int argc, const char * argv[]) {
                 
                 intr1.aspectRatio = (double) W/H;
                 cout<<"Aspect Ratio = "<<intr1.aspectRatio<<endl;
-                std::ofstream outFile1("intrinsics1.raw", std::ios::binary);
-                outFile1.write((const char*)&intr1, sizeof(intrinsics));
                 
+//                std::ofstream outFile1("intrinsics1.raw", std::ios::binary);
+//                outFile1.write((const char*)&intr1, sizeof(intrinsics));
+//
                 
                 intr2.K1 = cam2.D.at<double>(0,0);
                 intr2.K2 = cam2.D.at<double>(0,1);
@@ -288,24 +329,28 @@ int main(int argc, const char * argv[]) {
                 
                 intr2.aspectRatio = (double) W/H;
                 cout<<"Aspect Ratio = "<<intr2.aspectRatio<<endl;
-                std::ofstream outFile2("intrinsics2.raw", std::ios::binary);
-                outFile2.write((const char*)&intr2, sizeof(intrinsics));
+                write("./Result/intrinsicsLeft.bin", intr1);
+                write("./Result/intrinsicsRight.bin", intr2);
+//                std::ofstream outFile2("intrinsics2.raw", std::ios::binary);
+//                outFile2.write((const char*)&intr2, sizeof(intrinsics));
+//                
+                
                 
              //   Rect validRoI[2];
                 Mat map1, map2, map3, map4;
                 int number = Distortion_Image_No;
                 
            // stereoRectify(cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY,1,cam1.img.size(), &validRoI[0], &validRoI[1]);
-            stereoRectify(cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY);
+            
+                stereoRectify(cam1.K, cam1.D, cam2.K, cam2.D, cam1.img.size(), R, T, R1, R2, P1, P2, Q, CALIB_ZERO_DISPARITY);
+               
+                
                 cout <<"good"<<endl;
                 initUndistortRectifyMap(cam1.K, cam1.D, R1, P1, cam1.img.size(), CV_32FC1, map1, map2);
                 initUndistortRectifyMap(cam2.K, cam2.D, R2, P2, cam2.img.size(), CV_32FC1, map3, map4);
                 rectifiedimage(imgs_directory1, number, map1,map2, 1);
                 rectifiedimage(imgs_directory2, number, map3,map4, 2);
-                Angles = R2YPR(R);
-                cout<<"x_1 = "<<Angles[0]<<endl;
-                cout<<"y_2 = "<<Angles[1]<<endl;
-                cout<<"z_3 = "<<Angles[2]<<endl;
+              
 
               
                 
@@ -351,7 +396,7 @@ int main(int argc, const char * argv[]) {
                     
                     cout<<endl;
                     cout<<"*****************************************"<<endl;
-                    cout<<"Rotation Vector: "<<endl;
+                    cout<<"Rotation Matrix: "<<endl;
                     cout <<R<<endl;
                     
                     std::ofstream output_file5("./Stereo/B_Rotation_vector.txt");
@@ -436,12 +481,15 @@ int main(int argc, const char * argv[]) {
                     output_file13 << Q;
                     output_file13.close();
                     cout<<"*****************************************"<<endl;
-                    system("rm ./Result/*");
+                   // system("rm ./Result/*");
                     system("./Stereo/runn.sh");
                     system("cp ./Stereo/RESULT.txt ./Result/");
                     system("rm ./Stereo/*.txt");
                     }
                     }
+                else
+                    cout<<"Please choose the correct Option in the Configuration File"<<endl;
+                }
                     out= false;
                     break;
             
@@ -465,9 +513,9 @@ void rectifiedimage(char const* imgs_directory,int number, Mat mapx, Mat mapy, i
     //undistort(imgk, imgdis_corrected, camera_matrix, Distortion_coeff);
     remap(imgk, imgdis_corrected, mapx, mapy, cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar());
     cout<<"Remap done"<<endl;
-    string Save_corrected ="Distortion_Corrected" + std::to_string(pos) + EXT;
+    string Save_corrected ="./Result/Distortion_Corrected" + std::to_string(pos) + EXT;
     imwrite( Save_corrected, imgdis_corrected );
-    string Save_original ="Undistorted_Original" + std::to_string(pos) + EXT;
+    string Save_original ="./Result/Undistorted_Original" + std::to_string(pos) + EXT;
     imwrite( Save_original, ori );
 }
 

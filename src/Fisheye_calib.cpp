@@ -8,6 +8,22 @@
 
 #include "Fisheye_calib.hpp"
 
+void drawAxis(cv::Mat &_image, cv::InputArray _cameraMatrix, cv::InputArray _distCoeffs,
+              cv::InputArray _rvec, cv::InputArray _tvec, float length) {
+    // project axis points
+    std::vector< cv::Point3f > axisPoints;
+    axisPoints.push_back(cv::Point3f(0, 0, 0));
+    axisPoints.push_back(cv::Point3f(length, 0, 0));
+    axisPoints.push_back(cv::Point3f(0, length, 0));
+    axisPoints.push_back(cv::Point3f(length, length, 0));
+    std::vector< cv::Point2f > imagePoints;
+    cv::projectPoints(axisPoints, _rvec, _tvec, _cameraMatrix, _distCoeffs, imagePoints);
+    
+    // draw axis lines
+    cv::line(_image, imagePoints[0], imagePoints[1], cv::Scalar(0, 0, 255), 3);
+    cv::line(_image, imagePoints[0], imagePoints[2], cv::Scalar(0, 255, 0), 3);
+    cv::line(_image, imagePoints[0], imagePoints[3], cv::Scalar(255, 0, 0), 3);
+}
 
 Fisheye_calibrate:: Fisheye_calibrate(int board_width, int board_height, int num_imgs, float square_size, const char *imgs_directory){
     
@@ -38,9 +54,14 @@ void Fisheye_calibrate::Varjo_initialize(){
                          TermCriteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.1));
             drawChessboardCorners(grey, boardsize, corners, Ok);
         }
-        namedWindow( "View", WINDOW_AUTOSIZE );
-        imshow("View", grey);
-        waitKey(0);
+        
+        if (View == 1)
+        {
+            namedWindow( "View", WINDOW_AUTOSIZE );
+            imshow("View", grey);
+            waitKey(0);
+        }
+
         // Evaluating the corners in the Real world
         
         for (int j=0; j<Board_height; j++) {
@@ -54,6 +75,9 @@ void Fisheye_calibrate::Varjo_initialize(){
             RealP.push_back(realw);
             ImageP.push_back(corners);
         }
+        
+  
+        
         realw.clear();
         corners.clear();
         
@@ -67,6 +91,15 @@ void Fisheye_calibrate::Varjo_initialize(){
 
     //calibrateCamera(RealP, ImageP, img.size(), K, D, rvecs, tvecs, flag);
     double mse= fisheye::calibrate(RealP, ImageP, img.size(), K, D, rvecs, tvecs, flag,  cv::TermCriteria(3, 20, 1e-6));
+    
+//    Mat matImg;
+//    cv::solvePnP(RealP, ImageP, K, D, rvecs, tvecs);
+//    drawAxis(matImg, K, D, rvecs, tvecs, 90);
+//
+//    cv::imshow("Camera", matImg);
+//    char c = cv::waitKey(30);
+    
+    
     cout<<"Before K and D : "<<endl<<K<<endl<<D<<endl;
     cout<<"Mean Square Error = "<<mse<<endl;
     //      Accessing elements in a matrix
@@ -139,6 +172,8 @@ void Fisheye_calibrate::Varjo_initialize(){
     FOV(K,imageSize);
     cout<<"FOV X= "<<aFOV[0]<<endl;
     cout<<"FOV Y= "<<aFOV[1]<<endl;
+   
+    
     
     if(kp == 1)
     {

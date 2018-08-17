@@ -19,21 +19,26 @@
 #include <string>
 #include <stdlib.h>
 #include <math.h>
-
 using namespace std;
 using namespace cv;
 
 //Config File
 #define EXT ".jpg"
+#define Units "mm"
+#define View 0 // 1 - enable , 0 - disable
+#define Option 1 // 0 - Left folder , 1 - Right folder , 2 - Both folders , Any other - Left Folder
+#define convert 1000
 #define Width 1008
 #define Height 1008
-#define ImageCount 34
+#define ImageCount 91
 #define SQsize 90//in millimeter(mm)
 #define Board_H 6
 #define Board_W 10
+#define Main_Path "/Users/thiyaga/Documents/thiy/Codes/Camera_Test/build/Debug"
 #define Left_Directory "./VLeftBig/"
 #define Right_Directory "./VRightBig/"
-#define Distortion_Image_No 6
-#define Model 1 // Parm - 0 (Pinhole Model), Parm - 1 (Fisheye Model)
+#define Distortion_Image_No 8
+#define Model 0 // Parm - 0 (Pinhole Model), Parm - 1 (Fisheye Model)
 #endif /* VarjoVST_h */
+
 
